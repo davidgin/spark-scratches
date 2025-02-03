@@ -157,6 +157,142 @@ Then analyze the logs:
 
 grep "GC" logs/spark-job.log
 
+3. Start the Spark Cluster with DataFlint
+    docker-compose up -d
+    Copy the streaming job into the container:
+    docker cp spark_streaming_dataflint.py spark-master:/spark_streaming_dataflint.py
+    docker exec -it spark-master spark-submit --master spark://spark-master:7077 /spark_streaming_dataflint.py
+
+Spark Streaming with DataFlint for Monitoring in Docker-Compose
+
+This example extends your Spark Streaming setup by integrating DataFlint for enhanced monitoring.
+1. Update docker-compose.yml
+
+Modify your Spark cluster to include DataFlint for monitoring.
+
+
+
+✅ Key Additions:
+
+    Enabled DataFlint monitoring in Spark Master and Worker via SPARK_PLUGINS=io.dataflint.spark.SparkDataflintPlugin.
+
+2. Create the Streaming Job (spark_streaming_dataflint.py)
+
+This Spark job:
+
+    Reads real-time data from Netcat (nc -lk -p 9999).
+    Counts words in real-time.
+    Prints results to the console.
+    Includes DataFlint Monitoring.
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import explode, split
+
+# Initialize Spark with DataFlint Plugin
+spark = SparkSession.builder \
+    .appName("SparkStreamingDataFlint") \
+    .master("spark://spark-master:7077") \
+    .config("spark.jars.packages", "io.dataflint:spark_2.12:0.2.9") \
+    .config("spark.plugins", "io.dataflint.spark.SparkDataflintPlugin") \
+    .getOrCreate()
+
+# Read Streaming Data from Netcat
+lines = spark.readStream \
+    .format("socket") \
+    .option("host", "netcat-server") \
+    .option("port", 9999) \
+    .load()
+
+# Split lines into words
+words = lines.select(explode(split(lines.value, " ")).alias("word"))
+
+# Count occurrences of each word
+word_counts = words.groupBy("word").count()
+
+# Output results to console
+query = word_counts.writeStream \
+    .outputMode("complete") \
+    .format("console") \
+    .start()
+
+query.awaitTermination()
+
+3. Start the Spark Cluster with DataFlint
+
+Run:
+
+docker-compose up -d
+
+Copy the streaming job into the container:
+
+docker cp spark_streaming_dataflint.py spark-master:/spark_streaming_dataflint.py
+
+Run the Spark Streaming Job with DataFlint:
+
+docker exec -it spark-master spark-submit --master spark://spark-master:7077 /spark_streaming_dataflint.py
+
+4. Test the Streaming Application
+
+Send test messages via Netcat:
+
+nc localhost 9999
+
+💬 Type messages in the terminal, such as:
+
+hello world spark streaming is awesome
+hello spark monitoring
+
+📌 The Spark Streaming application will process the words and print real-time word counts.
+5. Monitor with DataFlint
+
+Open Spark UI (with DataFlint added) at:
+
+http://localhost:8080
+
+✅ Navigate to the "DataFlint" tab for:
+
+    Query Breakdown with performance metrics.
+    Live Cluster Monitoring.
+    Execution Timeline & Performance Insights.
+6. Stopping the Cluster
+
+To stop all containers:
+
+docker-compose down
+
+
+Spark image does not include the DataFlint jar by default. You need to manually provide the DataFlint JAR package either by:
+
+    Passing it in spark-submit (--packages io.dataflint:spark_2.12:0.2.9).
+    Mounting the JAR inside the container and referencing it in the configuration
+
+Option 1: Pass DataFlint as a Dependency in spark-submit
+
+This is the simplest way to use DataFlint without modifying the image.
+
+Run the job with:
+
+docker exec -it spark-master spark-submit \
+    --master spark://spark-master:7077 \
+    --packages io.dataflint:spark_2.12:0.2.9 \
+    --conf spark.plugins=io.dataflint.spark.SparkDataflintPlugin \
+    /spark_streaming_dataflint.py
+
+✅ This will automatically download the DataFlint JAR and enable the plugin.
+Option 2: Mount the DataFlint JAR into the Spark Container
+
+If you want a persistent setup, manually download the DataFlint JAR and mount it into the container.
+
+1️⃣ Download the JAR (Replace version as needed):
+
+wget https://repo1.maven.org/maven2/io/dataflint/spark_2.12/0.2.9/spark_2.12-0.2.9.jar -O dataflint.jar
+
+
+
+
+
+
+
 
 
 
