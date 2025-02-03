@@ -289,7 +289,23 @@ wget https://repo1.maven.org/maven2/io/dataflint/spark_2.12/0.2.9/spark_2.12-0.2
 
 
 
+3️⃣ Restart the Cluster:
 
+docker-compose down && docker-compose up -d
+
+4️⃣ Run the Spark Streaming Job:
+
+docker exec -it spark-master spark-submit \
+    --master spark://spark-master:7077 \
+    --conf spark.plugins=io.dataflint.spark.SparkDataflintPlugin \
+    /spark_streaming_dataflint.py
+
+Summary of Approaches
+Approach	Pros	Cons
+Use --packages in spark-submit	✅ No need to modify images	❌ Downloads the JAR each time
+Mount JAR via docker-compose.yml	✅ Persistent & avoids re-downloading	❌ Requires manually downloading the JAR
+
+If you plan to use DataFlint regularly, Option 2 (Mount JAR) is preferred for efficiency.
 
 
 
