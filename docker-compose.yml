@@ -1,11 +1,12 @@
 version: '3'
 services:
   spark:
-    image: bitnami/spark:latest  # Updated to latest Spark version
+    image: bitnami/spark:latest
     container_name: spark-master
     environment:
       - SPARK_MODE=master
       - SPARK_MASTER_HOST=spark-master
+      - SPARK_PLUGINS=io.dataflint.spark.SparkDataflintPlugin
     ports:
       - "8080:8080"  # Spark Web UI
       - "7077:7077"  # Spark Master
@@ -13,11 +14,12 @@ services:
       - spark-network
 
   worker:
-    image: bitnami/spark:latest  # Updated Spark worker image
+    image: bitnami/spark:latest
     container_name: spark-worker
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_PLUGINS=io.dataflint.spark.SparkDataflintPlugin
     depends_on:
       - spark
     networks:
