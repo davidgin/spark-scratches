@@ -300,10 +300,12 @@ docker exec -it spark-master spark-submit \
     --conf spark.plugins=io.dataflint.spark.SparkDataflintPlugin \
     /spark_streaming_dataflint.py
 
-Summary of Approaches
-Approach	Pros	Cons
-Use --packages in spark-submit	✅ No need to modify images	❌ Downloads the JAR each time
-Mount JAR via docker-compose.yml	✅ Persistent & avoids re-downloading	❌ Requires manually downloading the JAR
+### **Summary of Approaches**
+
+| Approach                        | Pros                                      | Cons                                         |
+|---------------------------------|-------------------------------------------|----------------------------------------------|
+| **Use --packages in spark-submit** | ✅ No need to modify images               | ❌ Downloads the JAR each time               |
+| **Mount JAR via docker-compose.yml** | ✅ Persistent & avoids re-downloading     | ❌ Requires manually downloading the JAR    |
 
 If you plan to use DataFlint regularly, Option 2 (Mount JAR) is preferred for efficiency.
 
