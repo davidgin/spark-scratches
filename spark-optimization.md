@@ -404,4 +404,28 @@ df.show()
 | **Run Streaming Job**        | Use `spark.readStream` + DataFlint for monitoring                 |
 | **Monitor in UI**            | Open **Spark UI** → Click **DataFlint Tab**                        |
 
+# What You Need :
 
+✅ Spark 3.2+
+✅ Scala 2.12+ (or 2.13 if using Spark 3.4+)
+✅ Maven JAR (io.dataflint:spark_2.12:0.2.9)
+✅ Python or Scala for Spark Jobs
+You Can Use:
+
+    PySpark (.py files, Notebooks)
+    Scala (.scala files for Spark Jobs)
+    Java (.java Spark applications)
+
+Example (PySpark - No Lua Required):
+
+from pyspark.sql import SparkSession
+
+# Enable DataFlint
+spark = SparkSession.builder \
+    .config("spark.jars.packages", "io.dataflint:spark_2.12:0.2.9") \
+    .config("spark.plugins", "io.dataflint.spark.SparkDataflintPlugin") \
+    .getOrCreate()
+
+# Run a simple Spark DataFrame query
+df = spark.createDataFrame([(1, "Alice"), (2, "Bob")], ["id", "name"])
+df.show()
