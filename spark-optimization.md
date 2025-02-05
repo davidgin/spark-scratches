@@ -429,3 +429,23 @@ spark = SparkSession.builder \
 # Run a simple Spark DataFrame query
 df = spark.createDataFrame([(1, "Alice"), (2, "Bob")], ["id", "name"])
 df.show()
+
+Integrating DataFlint Logs with Prometheus & Grafana for Real-Time Alerts
+
+You can integrate DataFlint logs with Prometheus & Grafana to monitor Spark Streaming in real time and trigger alerts for performance issues.
+1. Overview of the Architecture
+
+✅ DataFlint collects Spark performance metrics.
+✅ Prometheus scrapes metrics from Spark and stores them.
+✅ Grafana visualizes metrics and triggers real-time alerts.
+
+[Spark + DataFlint] --> [Prometheus] --> [Grafana Dashboards]
+
+2. Update docker-compose.yml to Include Prometheus & Grafana
+
+Modify your docker-compose.yml file to add:
+
+    Prometheus (for collecting Spark metrics).
+    Grafana (for visualizing DataFlint/Spark performance).
+
+
