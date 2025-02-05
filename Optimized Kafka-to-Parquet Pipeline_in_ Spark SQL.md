@@ -298,11 +298,9 @@ WHERE event_time >= WATERMARK(event_time, "10 minutes");
 ✅ Yes, the combination of MERGE INTO, checkpointing, and watermarking ensures Spark processes Kafka’s at-least-once delivery without duplicates.
 🚀 Next Steps
 
-Would you like an Iceberg streaming ingestion DAG using Airflow for better orchestration? 🚀
-You said:
+
 does SELECT * FROM kafka_stream is from a table named kafka_stream or from the stream itself ?
-ChatGPT said:
-ChatGPT
+
 Is SELECT * FROM kafka_stream Reading from a Table or a Stream?
 
 ✅ It depends on how kafka_stream is defined.
