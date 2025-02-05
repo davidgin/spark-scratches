@@ -1,4 +1,4 @@
-# Kubernetes CronJob to Trigger EMR Jobs
+# Helm Chart: Deploy Kubernetes-Orchestrated EMR Jobs
 apiVersion: batch/v1
 kind: CronJob
 metadata:
