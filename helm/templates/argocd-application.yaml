@@ -1,0 +1,20 @@
+# Deploy ArgoCD for GitOps-Based EMR Job Deployment
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: elastic-emr
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: "https://github.com/my-org/my-repo.git"
+    targetRevision: HEAD
+    path: helm
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
