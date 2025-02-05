@@ -1,0 +1,5 @@
+#Helm Configurations Manages EMR job execution dynamically.
+replicaCount: 1
+
+emr:
+  cluster_name: "elastic-emr-cluster"
