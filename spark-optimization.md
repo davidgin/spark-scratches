@@ -376,7 +376,7 @@ You Can Use:
     Scala (.scala files for Spark Jobs)
     Java (.java Spark applications)
 
-Example (PySpark - No Lua Required):
+Example (PySpark ):
 
 from pyspark.sql import SparkSession
 
