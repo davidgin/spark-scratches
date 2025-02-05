@@ -1,0 +1,19 @@
+# Kubernetes CronJob to Trigger EMR Jobs
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: elastic-emr
+spec:
+  schedule: "*/15 * * * *" # Runs every 15 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: aws-cli
+              image: amazon/aws-cli
+              command:
+                - /bin/sh
+                - -c
+                - "aws emr add-steps --cluster-id $(aws emr list-clusters --active --query 'Clusters[0].Id' --output text) --steps Type=Spark,Name=SparkApp,ActionOnFailure=CONTINUE,Args=[--class,my.spark.JobClass,--deploy-mode,cluster,--master,yarn,--conf,spark.executor.memory=4g]"
+          restartPolicy: OnFailure
