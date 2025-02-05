@@ -47,7 +47,7 @@ PARTITIONED BY (event_date);
 3️⃣ Process & Upsert Data in Iceberg
 🔥 Use MERGE INTO to Handle At-Least-Once Processing
 
-MERGE INTO iceberg_transactions target
+```MERGE INTO iceberg_transactions target
 USING (
   SELECT user_id, transaction_amount, event_time, CAST(event_time AS DATE) AS event_date
   FROM kafka_stream
@@ -58,13 +58,14 @@ WHEN MATCHED THEN
 WHEN NOT MATCHED THEN
   INSERT (user_id, transaction_amount, event_time, event_date)
   VALUES (source.user_id, source.transaction_amount, source.event_time, source.event_date);
-
+```
 💡 Result: Avoids duplicates in at-least-once Kafka processing ✅
 4️⃣ Time-Travel Queries with Iceberg
 🔥 Best Practices for Time Travel
 
-| **Optimization** | **Solution** |
-|-----------------|-------------|
+| **Optimization**             | **Solution** |
+|-----------------|-----------------
+
 | **Use `AS OF TIMESTAMP` for historical queries** | Queries data **as it was at a specific time**. |
 | **Use `VERSION AS OF` for rollback** | Restores a previous table state. |
 | **Enable `SNAPSHOT_ID` pruning** | Reads only **relevant metadata**, improving query speed. |
@@ -95,8 +96,8 @@ CALL iceberg_transactions.REWRITE_DATAFILES();
 💡 Result: Improves query speed & reduces storage overhead ✅
 🚀 Final Summary: Kafka-to-Iceberg Pipeline Optimizations
 
-| Step | Optimization |
-|------|-------------|
+| Step |                       Optimization |
+|------|    -------------|
 | **1️⃣ Kafka Read Semantics** | Choose **at-least-once (high throughput) or exactly-once (no duplicates)**. |
 | **2️⃣ Iceberg Ingestion** | Use **`MERGE INTO`** to prevent duplicates in at-least-once processing. |
 | **3️⃣ Time-Travel Queries** | Use **`TIMESTAMP AS OF`** to retrieve historical data. |
