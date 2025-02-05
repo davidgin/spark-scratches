@@ -448,4 +448,28 @@ Modify your docker-compose.yml file to add:
     Prometheus (for collecting Spark metrics).
     Grafana (for visualizing DataFlint/Spark performance).
 
+# Testing the Streaming Application
 
+Send test messages via Netcat:
+
+nc localhost 9999
+
+💬 Type messages, such as:
+
+hello world spark streaming monitoring
+hello spark alerts
+
+📌 The Spark Streaming application will process the words and print real-time word counts.
+8. Stopping the Cluster
+
+docker-compose down
+
+Final Summary
+Component	Function
+DataFlint	Collects Spark Streaming metrics
+Prometheus	Scrapes & stores Spark + DataFlint metrics
+Grafana	Visualizes metrics & triggers alerts
+Spark (Java/Python)	Runs real-time data processing
+Netcat (Bash)	Simulates a real-time data source
+
+🚀 Now you have real-time monitoring & alerting for Spark Streaming using Java, Bash, and Python!
