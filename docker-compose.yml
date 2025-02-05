@@ -1,33 +1,34 @@
 version: '3'
 services:
   spark:
-    image: bitnami/spark:latest
+    image: bitnami/spark:latest  # Updated to latest Spark version
     container_name: spark-master
-    volumes:
-      - ./dataflint.jar:/opt/spark/jars/dataflint.jar
     environment:
       - SPARK_MODE=master
       - SPARK_MASTER_HOST=spark-master
-      - SPARK_PLUGINS=io.dataflint.spark.SparkDataflintPlugin
-      - SPARK_EXTRA_CLASSPATH=/opt/spark/jars/dataflint.jar
     ports:
-      - "8080:8080"
-      - "7077:7077"
+      - "8080:8080"  # Spark Web UI
+      - "7077:7077"  # Spark Master
     networks:
       - spark-network
 
   worker:
-    image: bitnami/spark:latest
+    image: bitnami/spark:latest  # Updated Spark worker image
     container_name: spark-worker
-    volumes:
-      - ./dataflint.jar:/opt/spark/jars/dataflint.jar
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
-      - SPARK_PLUGINS=io.dataflint.spark.SparkDataflintPlugin
-      - SPARK_EXTRA_CLASSPATH=/opt/spark/jars/dataflint.jar
     depends_on:
       - spark
+    networks:
+      - spark-network
+
+  netcat:
+    image: alpine
+    container_name: netcat-server
+    command: sh -c "apk add --no-cache netcat && nc -lk -p 9999"
+    ports:
+      - "9999:9999"
     networks:
       - spark-network
 
