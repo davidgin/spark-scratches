@@ -284,3 +284,96 @@ Garbage Collection (GC) Issues	Check GC logs & long pauses	GC Logging / Executor
 Checkpoint Issues	Look at HDFS/S3 checkpoint logs	Log Files / Checkpoint Debugging
 
 
+
+Using DataFlint with Databricks
+
+Databricks provides a managed Apache Spark environment, and you can integrate DataFlint into Databricks clusters to enhance monitoring and debugging.
+1. Install DataFlint on Databricks
+
+Since Databricks does not support Spark plugins natively, you need to manually attach the DataFlint JAR to your cluster.
+Method 1: Using Maven Package (Recommended)
+
+1️⃣ Open Databricks Workspace
+2️⃣ Go to Clusters → Select your cluster
+3️⃣ Click Libraries → Install New
+4️⃣ Choose Maven and add the DataFlint package:
+
+io.dataflint:spark_2.12:0.2.9
+
+5️⃣ Click Install → Restart your cluster.
+Method 2: Manually Upload the JAR
+
+If the Maven package is not available: 1️⃣ Download the latest DataFlint JAR manually:
+
+wget https://repo1.maven.org/maven2/io/dataflint/spark_2.12/0.2.9/spark_2.12-0.2.9.jar
+
+2️⃣ Upload the JAR to DBFS (Databricks File System):
+
+databricks fs cp spark_2.12-0.2.9.jar dbfs:/FileStore/jars/
+
+3️⃣ In Databricks UI, go to Clusters → Libraries → Upload Library
+4️⃣ Select the uploaded DataFlint JAR from DBFS.
+2. Configure DataFlint in a Notebook
+
+Once the JAR is installed, configure DataFlint in a Databricks notebook:
+
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .config("spark.jars.packages", "io.dataflint:spark_2.12:0.2.9") \
+    .config("spark.plugins", "io.dataflint.spark.SparkDataflintPlugin") \
+    .getOrCreate()
+
+💡 Tip: If you uploaded the JAR manually, add this instead:
+
+spark = SparkSession.builder \
+    .config("spark.driver.extraClassPath", "/dbfs/FileStore/jars/spark_2.12-0.2.9.jar") \
+    .config("spark.executor.extraClassPath", "/dbfs/FileStore/jars/spark_2.12-0.2.9.jar") \
+    .config("spark.plugins", "io.dataflint.spark.SparkDataflintPlugin") \
+    .getOrCreate()
+
+3. Run a Streaming Job with DataFlint
+
+Now you can run Spark Streaming on Databricks and monitor it with DataFlint.
+Example: Streaming Word Count
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import explode, split
+
+# Enable DataFlint
+spark = SparkSession.builder.getOrCreate()
+
+# Read streaming data from Databricks socket
+lines = spark.readStream.format("socket") \
+    .option("host", "localhost") \
+    .option("port", 9999) \
+    .load()
+
+# Process words
+words = lines.select(explode(split(lines.value, " ")).alias("word"))
+word_counts = words.groupBy("word").count()
+
+# Output results to console
+query = word_counts.writeStream.outputMode("complete").format("console").start()
+query.awaitTermination()
+
+4. Monitor Performance Using DataFlint
+
+🔹 Open Databricks Web UI
+🔹 Go to Clusters → Spark UI → DataFlint Tab
+🔹 Analyze:
+
+    Slow queries
+    Shuffle delays
+    Executor bottlenecks
+    Memory & GC usage
+
+Summary
+Step	Action
+Install DataFlint	Add Maven package io.dataflint:spark_2.12:0.2.9 OR upload JAR manually
+Configure Databricks Cluster	Set spark.plugins=io.dataflint.spark.SparkDataflintPlugin
+Run Streaming Job	Use spark.readStream + DataFlint for monitoring
+Monitor in UI	Open Spark UI → Click DataFlint Tab
+
+
+
