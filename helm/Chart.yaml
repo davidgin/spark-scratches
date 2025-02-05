@@ -1,3 +1,4 @@
+#Helm Chart: Deploy Kubernetes-Orchestrated EMR Jobs
 apiVersion: v2
 name: elastic-emr
 description: Helm chart for orchestrating AWS EMR jobs
