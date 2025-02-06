@@ -1,0 +1,12 @@
+## Deploy Terraform:
+  terraform init
+  terraform apply -auto-approve
+
+##provisions AWS EMR with Spot Instances & On-Demand fallback.
+
+## Deploy Helm Chart:
+  helm install elastic-emr ./helm/
+##  Automates GitOps-based EMR job deployment
+# Deploys Kubernetes CronJob to orchestrate EMR jobs.
+# Deploy ArgoCD
+kubectl apply -f helm/templates/argocd-application.yaml
